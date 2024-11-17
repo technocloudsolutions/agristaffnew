@@ -2,20 +2,255 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 142.1 76.2% 36.3%;
+    --primary-foreground: 355.7 100% 97.3%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 142.1 76.2% 36.3%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 20 14.3% 4.1%;
+    --foreground: 0 0% 95%;
+    --card: 24 9.8% 10%;
+    --card-foreground: 0 0% 95%;
+    --popover: 0 0% 9%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 142.1 70.6% 45.3%;
+    --primary-foreground: 144.9 80.4% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 12 6.5% 15.1%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 85.7% 97.3%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 142.4 71.8% 29.2%;
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Toggle switch styles */
+.toggle-checkbox:checked {
+  right: 0;
+  border-color: #68D391;
+}
+
+.toggle-checkbox:checked + .toggle-label {
+  background-color: #68D391;
+}
+
+.toggle-checkbox {
+  right: 0;
+  transition: all 0.3s;
+}
+
+.toggle-label {
+  transition: background-color 0.3s;
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out;
+}
+
+/* Add smooth transitions */
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* Add hover effects */
+.hover-lift {
+  transition: transform 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+}
+
+/* Add focus styles */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary;
+}
+
+/* Add smooth transitions for theme changes */
+.transition-colors {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
+}
+
+/* Add a subtle animation for content fade in */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Add these input-specific styles to your globals.css */
+
+/* Base input styles */
+.input-focus {
+  @apply w-full px-4 py-2.5;
+  @apply bg-white dark:bg-gray-800;
+  @apply border border-gray-300 dark:border-gray-600;
+  @apply rounded-md;
+  @apply text-gray-900 dark:text-gray-100;
+  @apply placeholder:text-gray-500 dark:placeholder:text-gray-400;
+  @apply focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent;
+  @apply disabled:opacity-50 disabled:cursor-not-allowed;
+  @apply transition-colors duration-200;
+}
+
+/* Select element styles */
+select.input-focus {
+  @apply pr-10;
+  @apply bg-no-repeat bg-right;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-size: 1.25rem;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+/* Textarea styles */
+textarea.input-focus {
+  @apply min-h-[100px] resize-y;
+  @apply leading-relaxed;
+}
+
+/* Form group styling */
+.form-group {
+  @apply space-y-2;
+}
+
+.form-group label {
+  @apply block text-sm font-medium text-foreground;
+}
+
+.form-group .helper-text {
+  @apply text-xs text-muted-foreground mt-1;
+}
+
+/* Input sizes */
+.input-sm {
+  @apply px-3 py-1.5 text-sm;
+}
+
+.input-lg {
+  @apply px-4 py-3 text-lg;
+}
+
+/* Dark mode adjustments */
+.dark .input-focus {
+  @apply bg-background border-input;
+  @apply focus:ring-offset-background;
+}
+
+/* Error state */
+.input-error {
+  @apply border-destructive focus:ring-destructive;
+}
+
+/* Success state */
+.input-success {
+  @apply border-green-500 focus:ring-green-500;
+}
+
+/* Readonly state */
+.input-focus[readonly] {
+  @apply bg-muted cursor-default;
+}
+
+/* Add these button styles */
+.btn-primary {
+  @apply bg-primary text-primary-foreground;
+  @apply px-4 py-2 rounded-md;
+  @apply font-medium;
+  @apply hover:opacity-90 transition-opacity;
+  @apply focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2;
+  @apply disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.system-settings {
+  background-color: #111827;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  color: #fff;
+}
+
+.system-settings h2 {
+  color: #fff;
+  margin-bottom: 1.5rem;
+}
+
+.system-settings .setting-group {
+  margin-bottom: 2rem;
+}
+
+.system-settings .setting-label {
+  color: #9CA3AF;
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
+.system-settings .setting-value {
+  color: #fff;
+  font-size: 1rem;
+}
+
+.system-settings .release-notes {
+  background-color: #1F2937;
+  padding: 0.75rem;
+  border-radius: 0.375rem;
+  margin: 0.5rem 0;
 }

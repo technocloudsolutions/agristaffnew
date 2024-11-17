@@ -1,101 +1,120 @@
-import Image from "next/image";
+'use client';
+
+import { useAuth } from '@/context/AuthContext';
+import SignIn from '@/components/auth/SignIn';
+import SignUp from '@/components/auth/SignUp';
+import { auth } from '@/firebase/config';
+import { signOut } from 'firebase/auth';
+import { useState, useEffect } from 'react';
+import { db } from '@/firebase/config';
+import { doc, getDoc } from 'firebase/firestore';
+import AdminDashboard from '@/components/dashboards/AdminDashboard';
+import DataEntryDashboard from '@/components/dashboards/DataEntryDashboard';
+import UserDashboard from '@/components/dashboards/UserDashboard';
+import ThemeToggle from '@/components/ThemeToggle';
+import Footer from '@/components/Footer';
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const { user, loading } = useAuth();
+  const [showSignUp, setShowSignUp] = useState(false);
+  const [userRole, setUserRole] = useState<string | null>(null);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      if (user) {
+        try {
+          const userDoc = await getDoc(doc(db, 'users', user.uid));
+          if (userDoc.exists()) {
+            setUserRole(userDoc.data().role);
+          }
+        } catch (err) {
+          console.error('Error fetching user role:', err);
+        }
+      }
+    };
+
+    fetchUserRole();
+  }, [user]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex flex-col bg-background transition-colors duration-300">
+        <div className="flex-grow flex flex-col items-center justify-center p-8">
+          <div className="w-full max-w-sm space-y-6">
+            <div className="text-center space-y-2 mb-8">
+              <h1 className="text-2xl font-bold tracking-tight">Welcome Back</h1>
+              <p className="text-muted-foreground">Sign in to access your account</p>
+            </div>
+            <div className="bg-card shadow-lg rounded-lg p-6 border border-border">
+              {showSignUp ? <SignUp /> : <SignIn />}
+              <button
+                onClick={() => setShowSignUp(!showSignUp)}
+                className="mt-4 text-primary hover:text-primary/80 transition-colors w-full text-center"
+              >
+                {showSignUp ? 'Already have an account? Sign In' : 'Need an account? Sign Up'}
+              </button>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-background flex flex-col transition-colors duration-300">
+      <nav className="bg-card shadow-md border-b border-border sticky top-0 z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-xl font-semibold tracking-tight">
+                {userRole === 'admin' ? 'Admin Dashboard' : 
+                 userRole === 'data-entry' ? 'Data Entry Dashboard' : 'User Dashboard'}
+              </h1>
+              <p className="text-sm text-muted-foreground">
+                Logged in as: {user.email}
+              </p>
+            </div>
+            <div className="flex items-center gap-4">
+              <ThemeToggle />
+              <button
+                onClick={() => signOut(auth)}
+                className="bg-destructive text-destructive-foreground px-4 py-2 rounded-md hover:bg-destructive/90 transition-colors focus:outline-none focus:ring-2 focus:ring-destructive focus:ring-offset-2 focus:ring-offset-background"
+              >
+                Sign Out
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
+        <div className="space-y-8">
+          {userRole === 'admin' && <AdminDashboard />}
+          {userRole === 'data-entry' && <DataEntryDashboard />}
+          {userRole === 'user' && <UserDashboard />}
+          {!userRole && (
+            <div className="bg-card rounded-lg shadow-md p-6 border border-border animate-fade-in">
+              <h2 className="text-xl font-semibold mb-4">
+                Welcome
+              </h2>
+              <p className="text-muted-foreground">
+                Your role is being assigned. Please wait...
+              </p>
+            </div>
+          )}
         </div>
       </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+      <Footer />
     </div>
   );
 }
