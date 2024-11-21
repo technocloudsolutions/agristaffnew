@@ -122,9 +122,9 @@ const ContactManagement = () => {
           contactStatus: data.contactStatus as ContactStatus,
           profilePicture: data.profilePicture || null,
           status: data.status as 'active' | 'inactive',
-          createdAt: data.createdAt ? new Date(data.createdAt.seconds * 1000) : new Date(),
-          updatedAt: data.updatedAt ? new Date(data.updatedAt.seconds * 1000) : new Date(),
-          deletedAt: data.deletedAt ? new Date(data.deletedAt.seconds * 1000) : null,
+          createdAt: data.createdAt || Timestamp.now(),
+          updatedAt: data.updatedAt || Timestamp.now(),
+          deletedAt: data.deletedAt || null,
           createdBy: data.createdBy || '',
           updatedBy: data.updatedBy || '',
           deletedBy: data.deletedBy || null
@@ -1539,7 +1539,7 @@ const ContactManagement = () => {
                       <div className="flex items-center justify-between">
                         <span className="text-muted-foreground">Created At:</span>
                         <span>
-                          {viewingContact.createdAt.toLocaleString()}
+                          {viewingContact.createdAt.toDate().toLocaleString()}
                         </span>
                       </div>
                       <div className="flex items-center justify-between">
@@ -1549,7 +1549,7 @@ const ContactManagement = () => {
                       <div className="flex items-center justify-between">
                         <span className="text-muted-foreground">Last Updated At:</span>
                         <span>
-                          {viewingContact.updatedAt.toLocaleString()}
+                          {viewingContact.updatedAt.toDate().toLocaleString()}
                         </span>
                       </div>
                       {viewingContact.deletedAt && (
@@ -1561,7 +1561,7 @@ const ContactManagement = () => {
                           <div className="flex items-center justify-between">
                             <span className="text-muted-foreground">Deleted At:</span>
                             <span>
-                              {viewingContact.deletedAt.toLocaleString()}
+                              {viewingContact.deletedAt.toDate().toLocaleString()}
                             </span>
                           </div>
                         </>

@@ -6,25 +6,12 @@ export interface SystemVersion {
   buildNumber: string;
   releaseDate: Timestamp;
   description?: string;
-  changes?: string[];
-  createdAt: Timestamp;
-  createdBy: string;
+  features?: string[];
   isActive: boolean;
-  history?: VersionHistory[];
-}
-
-export interface VersionHistory {
-  id: string;
-  action: 'created' | 'updated' | 'activated' | 'deactivated';
-  timestamp: Timestamp;
-  performedBy: string;
-  details?: {
-    previousVersion?: string;
-    newVersion?: string;
-    previousBuild?: string;
-    newBuild?: string;
-    changes?: string[];
-  };
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+  createdBy: string;
+  updatedBy?: string;
 }
 
 export interface NewSystemVersion {
@@ -32,6 +19,6 @@ export interface NewSystemVersion {
   buildNumber: string;
   releaseDate: Date;
   description?: string;
-  changes?: string[];
+  features?: string[];
   isActive: boolean;
 } 
