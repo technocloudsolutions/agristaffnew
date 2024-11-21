@@ -39,6 +39,10 @@ const formatPhoneNumber = (number: string) => {
   return truncated ? `+94${truncated}` : '';
 };
 
+const CONTACT_TITLES: ContactTitle[] = ['Mr', 'Mrs', 'Miss', 'Dr', 'Prof'];
+const CONTACT_TYPES: ContactType[] = ['Person', 'Institute'];
+const CONTACT_STATUSES: ContactStatus[] = ['On Duty', 'Retired', 'Transferred', 'Other'];
+
 const ContactManagement = () => {
   const { user, canManageContacts } = useAuth();
   const [contacts, setContacts] = useState<Contact[]>([]);
@@ -664,394 +668,332 @@ const ContactManagement = () => {
 
       {/* Contact Form Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center overflow-y-auto">
-          <div className="relative bg-card border border-border rounded-lg shadow-lg w-full max-w-4xl m-4">
-            <form onSubmit={handleSubmit}>
-              {/* Form Header */}
-              <div className="flex items-center justify-between bg-muted/40 px-6 py-4 border-b border-border">
-                <h3 className="text-xl font-semibold flex items-center gap-2">
-                  <User className="h-5 w-5" />
-                  {isEditing ? 'Edit Contact' : 'Add New Contact'}
-                </h3>
-                <button
-                  type="button"
-                  onClick={() => setShowAddModal(false)}
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="bg-card border border-border rounded-lg shadow-lg w-full max-w-4xl mx-4">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between bg-muted/40 px-6 py-4 border-b border-border">
+              <h3 className="text-xl font-semibold flex items-center gap-2">
+                <User className="h-5 w-5" />
+                {isEditing ? 'Edit Contact' : 'Add New Contact'}
+              </h3>
+              <button
+                onClick={() => {
+                  setShowAddModal(false);
+                  setIsEditing(false);
+                  setEditingContact(null);
+                  resetForm();
+                }}
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
 
-              <div className="p-6 space-y-8 max-h-[calc(100vh-200px)] overflow-y-auto">
-                {/* Basic Information Section */}
+            {/* Modal Content */}
+            <form onSubmit={handleSubmit} className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Basic Information */}
                 <div className="space-y-4">
-                  <div className="flex items-center gap-2 text-lg font-medium text-foreground/80">
-                    <User className="h-5 w-5" />
-                    Basic Information
+                  <h4 className="font-medium text-muted-foreground">Basic Information</h4>
+                  
+                  {/* Profile Picture Upload */}
+                  <div className="flex flex-col items-center space-y-2">
+                    <div className="w-32 h-32 rounded-full overflow-hidden bg-muted flex items-center justify-center relative group">
+                      {newContact.profilePicture instanceof File ? (
+                        <img
+                          src={URL.createObjectURL(newContact.profilePicture)}
+                          alt="Profile preview"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : editingContact?.profilePicture ? (
+                        <img
+                          src={editingContact.profilePicture}
+                          alt="Current profile"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <User className="h-16 w-16 text-muted-foreground" />
+                      )}
+                      <label className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                        <ImageIcon className="h-6 w-6 text-white" />
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              setNewContact({ ...newContact, profilePicture: file });
+                            }
+                          }}
+                          className="hidden"
+                        />
+                      </label>
+                    </div>
+                    <span className="text-sm text-muted-foreground">
+                      Click to upload profile picture
+                    </span>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium mb-1.5">Title</label>
+
+                  <div className="grid grid-cols-4 gap-4">
+                    <div className="col-span-1">
+                      <label className="block text-sm font-medium text-muted-foreground mb-1">Title</label>
                       <select
                         value={newContact.title}
                         onChange={(e) => setNewContact({ ...newContact, title: e.target.value as ContactTitle })}
-                        className="w-full rounded-md border-input bg-background px-3 py-2 text-sm ring-offset-background"
+                        className="w-full p-2 border rounded bg-background text-foreground"
                       >
-                        {['Mr', 'Mrs', 'Miss', 'Dr', 'Prof'].map(title => (
+                        {CONTACT_TITLES.map((title: ContactTitle) => (
                           <option key={title} value={title}>{title}</option>
                         ))}
                       </select>
                     </div>
                     
-                    <div className="md:col-span-2">
-                      <label className="block text-sm font-medium mb-1.5">Full Name *</label>
+                    <div className="col-span-3">
+                      <label className="block text-sm font-medium text-muted-foreground mb-1">
+                        Full Name *
+                      </label>
                       <input
                         type="text"
                         value={newContact.fullName}
                         onChange={(e) => setNewContact({ ...newContact, fullName: e.target.value })}
-                        className="w-full rounded-md border-input bg-background px-3 py-2 text-sm ring-offset-background"
-                        placeholder="Enter full name"
+                        className="w-full p-2 border rounded bg-background text-foreground"
                         required
                       />
                     </div>
                   </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-muted-foreground mb-1">Department *</label>
+                    <select
+                      value={newContact.departmentId}
+                      onChange={(e) => setNewContact({ ...newContact, departmentId: e.target.value })}
+                      className="w-full p-2 border rounded bg-background text-foreground"
+                      required
+                    >
+                      <option value="">Select Department</option>
+                      {departments.map(dept => (
+                        <option key={dept.id} value={dept.id}>{dept.name}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-muted-foreground mb-1">Institute</label>
+                    <select
+                      value={newContact.instituteId}
+                      onChange={(e) => setNewContact({ ...newContact, instituteId: e.target.value })}
+                      className="w-full p-2 border rounded bg-background text-foreground"
+                    >
+                      <option value="">Select Institute</option>
+                      {institutes
+                        .filter(inst => inst.departmentId === newContact.departmentId)
+                        .map(inst => (
+                          <option key={inst.id} value={inst.id}>{inst.name}</option>
+                        ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-muted-foreground mb-1">Unit</label>
+                    <select
+                      value={newContact.unitId}
+                      onChange={(e) => setNewContact({ ...newContact, unitId: e.target.value })}
+                      className="w-full p-2 border rounded bg-background text-foreground"
+                      disabled={!newContact.instituteId}
+                    >
+                      <option value="">Select Unit</option>
+                      {units
+                        .filter(unit => unit.instituteId === newContact.instituteId)
+                        .map(unit => (
+                          <option key={unit.id} value={unit.id}>{unit.name}</option>
+                        ))}
+                    </select>
+                  </div>
                 </div>
 
-                {/* Organization Section */}
+                {/* Contact Information */}
                 <div className="space-y-4">
-                  <div className="flex items-center gap-2 text-lg font-medium text-foreground/80">
-                    <Building2 className="h-5 w-5" />
-                    Organization Details
+                  <h4 className="font-medium text-muted-foreground">Contact Information</h4>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-muted-foreground mb-1">Mobile No. 1</label>
+                    <input
+                      type="tel"
+                      value={newContact.mobileNo1}
+                      onChange={(e) => handlePhoneInput(e, 'mobileNo1')}
+                      placeholder="+94XXXXXXXXX"
+                      className="w-full p-2 border rounded bg-background text-foreground"
+                    />
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                  <div>
+                    <label className="block text-sm font-medium text-muted-foreground mb-1">Mobile No. 2</label>
+                    <input
+                      type="tel"
+                      value={newContact.mobileNo2}
+                      onChange={(e) => handlePhoneInput(e, 'mobileNo2')}
+                      placeholder="+94XXXXXXXXX"
+                      className="w-full p-2 border rounded bg-background text-foreground"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-muted-foreground mb-1">WhatsApp</label>
+                    <input
+                      type="tel"
+                      value={newContact.whatsAppNo}
+                      onChange={(e) => handlePhoneInput(e, 'whatsAppNo')}
+                      placeholder="+94XXXXXXXXX"
+                      className="w-full p-2 border rounded bg-background text-foreground"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-muted-foreground mb-1">Office No. 1</label>
+                    <input
+                      type="tel"
+                      value={newContact.officeNo1}
+                      onChange={(e) => handlePhoneInput(e, 'officeNo1')}
+                      placeholder="+94XXXXXXXXX"
+                      className="w-full p-2 border rounded bg-background text-foreground"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-muted-foreground mb-1">Office No. 2</label>
+                    <input
+                      type="tel"
+                      value={newContact.officeNo2}
+                      onChange={(e) => handlePhoneInput(e, 'officeNo2')}
+                      placeholder="+94XXXXXXXXX"
+                      className="w-full p-2 border rounded bg-background text-foreground"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-muted-foreground mb-1">Fax No. 1</label>
+                    <input
+                      type="tel"
+                      value={newContact.faxNo1}
+                      onChange={(e) => handlePhoneInput(e, 'faxNo1')}
+                      placeholder="+94XXXXXXXXX"
+                      className="w-full p-2 border rounded bg-background text-foreground"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-muted-foreground mb-1">Fax No. 2</label>
+                    <input
+                      type="tel"
+                      value={newContact.faxNo2}
+                      onChange={(e) => handlePhoneInput(e, 'faxNo2')}
+                      placeholder="+94XXXXXXXXX"
+                      className="w-full p-2 border rounded bg-background text-foreground"
+                    />
+                  </div>
+                </div>
+
+                {/* Additional Information */}
+                <div className="space-y-4">
+                  <h4 className="font-medium text-muted-foreground">Additional Information</h4>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-muted-foreground mb-1">Official Email *</label>
+                    <input
+                      type="email"
+                      value={newContact.officialEmail}
+                      onChange={(e) => setNewContact({ ...newContact, officialEmail: e.target.value })}
+                      className="w-full p-2 border rounded bg-background text-foreground"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-muted-foreground mb-1">Personal Email</label>
+                    <input
+                      type="email"
+                      value={newContact.personalEmail}
+                      onChange={(e) => setNewContact({ ...newContact, personalEmail: e.target.value })}
+                      className="w-full p-2 border rounded bg-background text-foreground"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-muted-foreground mb-1">Address</label>
+                    <textarea
+                      value={newContact.address}
+                      onChange={(e) => setNewContact({ ...newContact, address: e.target.value })}
+                      className="w-full p-2 border rounded bg-background text-foreground min-h-[100px]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-muted-foreground mb-1">Description</label>
+                    <textarea
+                      value={newContact.description}
+                      onChange={(e) => setNewContact({ ...newContact, description: e.target.value })}
+                      className="w-full p-2 border rounded bg-background text-foreground min-h-[100px]"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium mb-1.5">Department *</label>
+                      <label className="block text-sm font-medium text-muted-foreground mb-1">Contact Type</label>
                       <select
-                        value={newContact.departmentId}
-                        onChange={(e) => setNewContact({
-                          ...newContact,
-                          departmentId: e.target.value,
-                          instituteId: '',
-                          unitId: ''
-                        })}
-                        className="w-full rounded-md border-input bg-background px-3 py-2 text-sm ring-offset-background"
-                        required
+                        value={newContact.contactType}
+                        onChange={(e) => setNewContact({ ...newContact, contactType: e.target.value as ContactType })}
+                        className="w-full p-2 border rounded bg-background text-foreground"
                       >
-                        <option value="">Select Department</option>
-                        {departments.map(dept => (
-                          <option key={dept.id} value={dept.id}>{dept.name}</option>
+                        {CONTACT_TYPES.map((type: ContactType) => (
+                          <option key={type} value={type}>{type}</option>
                         ))}
                       </select>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium mb-1.5">Institute</label>
-                      <select
-                        value={newContact.instituteId}
-                        onChange={(e) => setNewContact({
-                          ...newContact,
-                          instituteId: e.target.value,
-                          unitId: ''
-                        })}
-                        className="w-full rounded-md border-input bg-background px-3 py-2 text-sm ring-offset-background"
-                        disabled={!newContact.departmentId}
-                      >
-                        <option value="">Select Institute</option>
-                        {institutes
-                          .filter(inst => inst.departmentId === newContact.departmentId)
-                          .map(inst => (
-                            <option key={inst.id} value={inst.id}>{inst.name}</option>
-                          ))}
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium mb-1.5">Unit</label>
-                      <select
-                        value={newContact.unitId}
-                        onChange={(e) => setNewContact({ ...newContact, unitId: e.target.value })}
-                        className="w-full rounded-md border-input bg-background px-3 py-2 text-sm ring-offset-background"
-                        disabled={!newContact.instituteId}
-                      >
-                        <option value="">Select Unit</option>
-                        {units
-                          .filter(unit => unit.instituteId === newContact.instituteId)
-                          .map(unit => (
-                            <option key={unit.id} value={unit.id}>{unit.name}</option>
-                          ))}
-                      </select>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Contact Information Section */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2 text-lg font-medium text-foreground/80">
-                    <Phone className="h-5 w-5" />
-                    Contact Information
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium mb-1.5">Mobile No. 1</label>
-                      <div className="relative">
-                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                          +94
-                        </span>
-                        <input
-                          type="tel"
-                          value={newContact.mobileNo1?.replace(/^\+94/, '') || ''} // Remove +94 for display
-                          onChange={(e) => handlePhoneInput(e, 'mobileNo1')}
-                          className="w-full rounded-md border-input bg-background pl-12 pr-3 py-2 text-sm ring-offset-background"
-                          placeholder="7XXXXXXXX"
-                          maxLength={9}
-                        />
-                      </div>
-                      <span className="text-xs text-muted-foreground mt-1">
-                        Enter 9 digits after +94
-                      </span>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium mb-1.5">Mobile No. 2</label>
-                      <div className="relative">
-                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                          +94
-                        </span>
-                        <input
-                          type="tel"
-                          value={newContact.mobileNo2?.replace(/^\+94/, '') || ''} // Remove +94 for display
-                          onChange={(e) => handlePhoneInput(e, 'mobileNo2')}
-                          className="w-full rounded-md border-input bg-background pl-12 pr-3 py-2 text-sm ring-offset-background"
-                          placeholder="7XXXXXXXX"
-                          maxLength={9}
-                        />
-                      </div>
-                      <span className="text-xs text-muted-foreground mt-1">
-                        Enter 9 digits after +94
-                      </span>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium mb-1.5">WhatsApp No.</label>
-                      <div className="relative">
-                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                          +94
-                        </span>
-                        <input
-                          type="tel"
-                          value={newContact.whatsAppNo?.replace(/^\+94/, '') || ''} // Remove +94 for display
-                          onChange={(e) => handlePhoneInput(e, 'whatsAppNo')}
-                          className="w-full rounded-md border-input bg-background pl-12 pr-3 py-2 text-sm ring-offset-background"
-                          placeholder="7XXXXXXXX"
-                          maxLength={9}
-                        />
-                      </div>
-                      <span className="text-xs text-muted-foreground mt-1">
-                        Enter 9 digits after +94
-                      </span>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium mb-1.5">Office No. 1</label>
-                      <div className="relative">
-                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                          +94
-                        </span>
-                        <input
-                          type="tel"
-                          value={newContact.officeNo1?.replace(/^\+94/, '') || ''} // Remove +94 for display
-                          onChange={(e) => handlePhoneInput(e, 'officeNo1')}
-                          className="w-full rounded-md border-input bg-background pl-12 pr-3 py-2 text-sm ring-offset-background"
-                          placeholder="7XXXXXXXX"
-                          maxLength={9}
-                        />
-                      </div>
-                      <span className="text-xs text-muted-foreground mt-1">
-                        Enter 9 digits after +94
-                      </span>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium mb-1.5">Office No. 2</label>
-                      <div className="relative">
-                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                          +94
-                        </span>
-                        <input
-                          type="tel"
-                          value={newContact.officeNo2?.replace(/^\+94/, '') || ''} // Remove +94 for display
-                          onChange={(e) => handlePhoneInput(e, 'officeNo2')}
-                          className="w-full rounded-md border-input bg-background pl-12 pr-3 py-2 text-sm ring-offset-background"
-                          placeholder="7XXXXXXXX"
-                          maxLength={9}
-                        />
-                      </div>
-                      <span className="text-xs text-muted-foreground mt-1">
-                        Enter 9 digits after +94
-                      </span>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium mb-1.5">Fax No. 1</label>
-                      <div className="relative">
-                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                          +94
-                        </span>
-                        <input
-                          type="tel"
-                          value={newContact.faxNo1?.replace(/^\+94/, '') || ''} // Remove +94 for display
-                          onChange={(e) => handlePhoneInput(e, 'faxNo1')}
-                          className="w-full rounded-md border-input bg-background pl-12 pr-3 py-2 text-sm ring-offset-background"
-                          placeholder="7XXXXXXXX"
-                          maxLength={9}
-                        />
-                      </div>
-                      <span className="text-xs text-muted-foreground mt-1">
-                        Enter 9 digits after +94
-                      </span>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium mb-1.5">Fax No. 2</label>
-                      <div className="relative">
-                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                          +94
-                        </span>
-                        <input
-                          type="tel"
-                          value={newContact.faxNo2?.replace(/^\+94/, '') || ''} // Remove +94 for display
-                          onChange={(e) => handlePhoneInput(e, 'faxNo2')}
-                          className="w-full rounded-md border-input bg-background pl-12 pr-3 py-2 text-sm ring-offset-background"
-                          placeholder="7XXXXXXXX"
-                          maxLength={9}
-                        />
-                      </div>
-                      <span className="text-xs text-muted-foreground mt-1">
-                        Enter 9 digits after +94
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Email & Additional Information */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2 text-lg font-medium text-foreground/80">
-                    <Mail className="h-5 w-5" />
-                    Email & Additional Information
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium mb-1.5">Official Email *</label>
-                      <input
-                        type="email"
-                        value={newContact.officialEmail}
-                        onChange={(e) => setNewContact({ ...newContact, officialEmail: e.target.value })}
-                        className="w-full rounded-md border-input bg-background px-3 py-2 text-sm ring-offset-background"
-                        placeholder="official@example.com"
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium mb-1.5">Personal Email</label>
-                      <input
-                        type="email"
-                        value={newContact.personalEmail}
-                        onChange={(e) => setNewContact({ ...newContact, personalEmail: e.target.value })}
-                        className="w-full rounded-md border-input bg-background px-3 py-2 text-sm ring-offset-background"
-                        placeholder="personal@example.com"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium mb-1.5">Contact Type</label>
-                      <select
-                        value={newContact.contactType}
-                        onChange={(e) => setNewContact({ ...newContact, contactType: e.target.value as ContactType })}
-                        className="w-full rounded-md border-input bg-background px-3 py-2 text-sm ring-offset-background"
-                      >
-                        <option value="Person">Person</option>
-                        <option value="Institute">Institute</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium mb-1.5">Contact Status</label>
+                      <label className="block text-sm font-medium text-muted-foreground mb-1">Contact Status</label>
                       <select
                         value={newContact.contactStatus}
                         onChange={(e) => setNewContact({ ...newContact, contactStatus: e.target.value as ContactStatus })}
-                        className="w-full rounded-md border-input bg-background px-3 py-2 text-sm ring-offset-background"
+                        className="w-full p-2 border rounded bg-background text-foreground"
                       >
-                        <option value="On Duty">On Duty</option>
-                        <option value="Retired">Retired</option>
-                        <option value="Transferred">Transferred</option>
-                        <option value="Other">Other</option>
+                        {CONTACT_STATUSES.map((status: ContactStatus) => (
+                          <option key={status} value={status}>{status}</option>
+                        ))}
                       </select>
-                    </div>
-
-                    <div className="md:col-span-2">
-                      <label className="block text-sm font-medium mb-1.5">Address</label>
-                      <textarea
-                        value={newContact.address}
-                        onChange={(e) => setNewContact({ ...newContact, address: e.target.value })}
-                        rows={3}
-                        className="w-full rounded-md border-input bg-background px-3 py-2 text-sm ring-offset-background"
-                        placeholder="Enter address"
-                      />
-                    </div>
-
-                    <div className="md:col-span-2">
-                      <label className="block text-sm font-medium mb-1.5">Description</label>
-                      <textarea
-                        value={newContact.description}
-                        onChange={(e) => setNewContact({ ...newContact, description: e.target.value })}
-                        rows={3}
-                        className="w-full rounded-md border-input bg-background px-3 py-2 text-sm ring-offset-background"
-                        placeholder="Enter description"
-                      />
-                    </div>
-
-                    <div className="md:col-span-2">
-                      <label className="block text-sm font-medium mb-1.5">Profile Picture</label>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            setNewContact({ ...newContact, profilePicture: file });
-                          }
-                        }}
-                        className="w-full rounded-md border-input bg-background px-3 py-2 text-sm ring-offset-background file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
-                      />
                     </div>
                   </div>
                 </div>
+              </div>
 
-                {/* Form Actions */}
-                <div className="flex justify-end gap-4 p-6 border-t border-border">
-                  <button
-                    type="button"
-                    onClick={() => setShowAddModal(false)}
-                    className="px-4 py-2 rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/90 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={isLoading}
-                    className="px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isLoading ? (
-                      <span className="flex items-center gap-2">
-                        <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></span>
-                        {isEditing ? 'Updating...' : 'Adding...'}
-                      </span>
-                    ) : (
-                      isEditing ? 'Update Contact' : 'Add Contact'
-                    )}
-                  </button>
-                </div>
+              {/* Form Actions */}
+              <div className="flex justify-end gap-4 mt-6 pt-6 border-t border-border">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowAddModal(false);
+                    setIsEditing(false);
+                    setEditingContact(null);
+                    resetForm();
+                  }}
+                  className="px-4 py-2 rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/90 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50"
+                >
+                  {isLoading ? (
+                    <span className="flex items-center gap-2">
+                      <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></span>
+                      {isEditing ? 'Updating...' : 'Adding...'}
+                    </span>
+                  ) : (
+                    isEditing ? 'Update Contact' : 'Add Contact'
+                  )}
+                </button>
               </div>
             </form>
           </div>
@@ -1340,8 +1282,8 @@ const ContactManagement = () => {
 
       {/* View Contact Modal */}
       {showViewModal && viewingContact && (
-        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
-          <div className="bg-card border border-border rounded-lg shadow-lg w-full max-w-4xl m-4 max-h-[90vh] overflow-hidden">
+        <div className="fixed inset-0 bg-[#252422]/80 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="bg-[#FFFCF2] border border-[#CCC5B9] rounded-lg shadow-lg w-full max-w-4xl mx-4">
             {/* Modal Header */}
             <div className="flex items-center justify-between bg-muted/40 px-6 py-4 border-b border-border">
               <h3 className="text-xl font-semibold flex items-center gap-2">
@@ -1406,7 +1348,7 @@ const ContactManagement = () => {
                       <Building2 className="h-5 w-5" />
                       Organization Details
                     </h5>
-                    <div className="bg-muted/40 rounded-lg p-4 space-y-2">
+                    <div className="bg-[#CCC5B9]/20 rounded-lg p-4 space-y-2">
                       <p className="flex justify-between">
                         <span className="text-muted-foreground">Department:</span>
                         <span className="font-medium">{departments.find(d => d.id === viewingContact.departmentId)?.name}</span>
@@ -1649,10 +1591,10 @@ const ContactManagement = () => {
 
       {/* Bulk Delete Confirmation Modal */}
       {showBulkDeleteModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center">
-          <div className="bg-[#1f2937] border border-gray-600 rounded-lg shadow-lg w-full max-w-md mx-4 p-6">
-            <h3 className="text-xl font-semibold mb-4 text-white">Confirm Bulk Delete</h3>
-            <p className="text-gray-300 mb-6">
+        <div className="fixed inset-0 bg-[#252422]/80 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="bg-[#FFFCF2] border border-[#CCC5B9] rounded-lg shadow-lg w-full max-w-md mx-4 p-6">
+            <h3 className="text-xl font-semibold mb-4 text-[#252422]">Confirm Bulk Delete</h3>
+            <p className="text-[#403D39] mb-6">
               Are you sure you want to delete {selectedContacts.length} contacts? 
               This action cannot be undone.
             </p>
@@ -1660,7 +1602,7 @@ const ContactManagement = () => {
               <button
                 type="button"
                 onClick={() => setShowBulkDeleteModal(false)}
-                className="px-4 py-2 rounded-md bg-gray-600 text-white hover:bg-gray-700 transition-colors"
+                className="px-4 py-2 rounded-md bg-[#CCC5B9] text-[#252422] hover:bg-[#403D39] hover:text-white transition-colors"
                 disabled={isLoading}
               >
                 Cancel
@@ -1669,7 +1611,7 @@ const ContactManagement = () => {
                 type="button"
                 onClick={handleBulkDelete}
                 disabled={isLoading}
-                className="px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-50"
+                className="px-4 py-2 rounded-md bg-[#EB5E28] text-white hover:bg-[#EB5E28]/90 transition-colors disabled:opacity-50"
               >
                 {isLoading ? (
                   <span className="flex items-center gap-2">
