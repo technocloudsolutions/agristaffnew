@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import { useAuth } from '@/hooks/useAuth';
 import { db } from '@/firebase/config';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
-import { useAuth } from '@/context/AuthContext';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 export default function CreateAdmin() {
   const { user } = useAuth();
@@ -17,13 +17,13 @@ export default function CreateAdmin() {
     setIsLoading(true);
     try {
       // First check if the user document exists
-      const userRef = doc(db, 'users', user.uid);
+      const userRef = doc(db, 'users', user.id);
       const userDoc = await getDoc(userRef);
 
       // Create or update the user document
       await setDoc(userRef, {
         email: user.email,
-        name: user.displayName || user.email?.split('@')[0],
+        name: user.name || user.email?.split('@')[0],
         role: 'admin',
         status: 'active',
         createdAt: new Date()
