@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/firebase/config';
 import { collection, getDocs, query, where } from 'firebase/firestore';
+import { Contact } from '@/types/contact';
 
 export async function GET(request: Request) {
   try {
@@ -22,11 +23,11 @@ export async function GET(request: Request) {
     // Get documents
     const snapshot = await getDocs(contactsQuery);
     
-    // Transform data
+    // Transform data with proper typing
     let contacts = snapshot.docs.map(doc => ({
       id: doc.id,
-      ...doc.data(),
-    }));
+      ...doc.data()
+    })) as Contact[];
 
     // Apply filters
     if (searchTerm) {
