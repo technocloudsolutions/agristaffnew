@@ -9,27 +9,29 @@ export interface Contact {
   title: ContactTitle;
   fullName: string;
   departmentId: string;
-  instituteId?: string;
-  unitId?: string;
-  mobileNo1?: string;
-  mobileNo2?: string;
-  whatsAppNo?: string;
-  officeNo1?: string;
-  officeNo2?: string;
-  faxNo1?: string;
-  faxNo2?: string;
-  personalEmail?: string;
+  instituteId?: string | null;
+  unitId?: string | null;
+  mobileNo1?: string | null;
+  mobileNo2?: string | null;
+  whatsAppNo?: string | null;
+  officeNo1?: string | null;
+  officeNo2?: string | null;
+  faxNo1?: string | null;
+  faxNo2?: string | null;
+  personalEmail?: string | null;
   officialEmail: string;
-  address?: string;
-  description?: string;
+  address?: string | null;
+  description?: string | null;
   contactType: ContactType;
   contactStatus: ContactStatus;
-  profilePicture?: string;
+  profilePicture?: string | null;
   status: 'active' | 'inactive';
   createdAt: Timestamp;
   updatedAt: Timestamp;
   createdBy: string;
   updatedBy: string;
+  deletedAt?: Timestamp | null;
+  deletedBy?: string | null;
 }
 
 export interface NewContact {
@@ -44,7 +46,7 @@ export interface NewContact {
   officeNo1?: string;
   officeNo2?: string;
   faxNo1?: string;
-  faxNo2?: string;
+  faxNo2: string;
   personalEmail?: string;
   officialEmail: string;
   address?: string;

@@ -3,6 +3,9 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { AuthProvider } from '@/context/AuthContext';
 import { ThemeProvider } from '@/context/ThemeContext';
+import { Settings } from 'lucide-react';
+import Link from 'next/link';
+import { cn } from '@/lib/utils';
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
