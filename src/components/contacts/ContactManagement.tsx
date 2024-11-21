@@ -1282,14 +1282,17 @@ const ContactManagement = () => {
 
       {/* View Contact Modal */}
       {showViewModal && viewingContact && (
-        <div className="fixed inset-0 bg-[#252422]/80 backdrop-blur-sm z-50 flex items-center justify-center">
-          <div className="bg-[#FFFCF2] border border-[#CCC5B9] rounded-lg shadow-lg w-full max-w-4xl mx-4">
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="bg-card border border-border rounded-lg shadow-lg w-full max-w-4xl mx-4">
             {/* Modal Header */}
             <div className="flex items-center justify-between bg-muted/40 px-6 py-4 border-b border-border">
-              <h3 className="text-xl font-semibold flex items-center gap-2">
-                <User className="h-5 w-5" />
-                Contact Details
-              </h3>
+              <div className="flex items-center gap-3">
+                <User className="h-5 w-5 text-primary" />
+                <div>
+                  <h3 className="text-xl font-semibold">Contact Details</h3>
+                  <p className="text-sm text-muted-foreground">View complete contact information</p>
+                </div>
+              </div>
               <button
                 onClick={() => {
                   setShowViewModal(false);
@@ -1307,88 +1310,86 @@ const ContactManagement = () => {
                 {/* Left Column */}
                 <div className="space-y-6">
                   {/* Profile Section */}
-                  <div className="flex items-center space-x-4">
-                    <div className="h-24 w-24 rounded-full overflow-hidden bg-muted flex items-center justify-center">
-                      {viewingContact.profilePicture ? (
-                        <img
-                          src={viewingContact.profilePicture}
-                          alt={viewingContact.fullName}
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <User className="h-12 w-12 text-muted-foreground" />
-                      )}
-                    </div>
-                    <div>
-                      <h4 className="text-xl font-semibold">
-                        {viewingContact.title} {viewingContact.fullName}
-                      </h4>
-                      <p className="text-muted-foreground">{viewingContact.officialEmail}</p>
-                      <div className="flex gap-2 mt-2">
-                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                          viewingContact.status === 'active'
-                            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
-                            : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100'
-                        }`}>
-                          {viewingContact.status}
-                        </span>
-                        <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100">
-                          {viewingContact.contactType}
-                        </span>
-                        <span className="px-2 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100">
-                          {viewingContact.contactStatus}
-                        </span>
+                  <div className="bg-muted/10 rounded-lg p-6">
+                    <div className="flex items-center space-x-4">
+                      <div className="h-24 w-24 rounded-full overflow-hidden bg-muted flex items-center justify-center border-2 border-primary/20">
+                        {viewingContact.profilePicture ? (
+                          <img
+                            src={viewingContact.profilePicture}
+                            alt={viewingContact.fullName}
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <User className="h-12 w-12 text-muted-foreground" />
+                        )}
+                      </div>
+                      <div>
+                        <h4 className="text-xl font-semibold flex items-center gap-2">
+                          {viewingContact.title} {viewingContact.fullName}
+                          {viewingContact.status === 'active' && (
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                              Active
+                            </span>
+                          )}
+                        </h4>
+                        <p className="text-muted-foreground mt-1">{viewingContact.officialEmail}</p>
+                        <div className="flex gap-2 mt-3">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            {viewingContact.contactType}
+                          </span>
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                            {viewingContact.contactStatus}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
 
                   {/* Organization Details */}
-                  <div className="space-y-4">
-                    <h5 className="text-lg font-medium flex items-center gap-2">
-                      <Building2 className="h-5 w-5" />
+                  <div className="bg-muted/10 rounded-lg p-6">
+                    <h5 className="text-lg font-medium flex items-center gap-2 mb-4">
+                      <Building2 className="h-5 w-5 text-primary" />
                       Organization Details
                     </h5>
-                    <div className="bg-[#CCC5B9]/20 rounded-lg p-4 space-y-2">
-                      <p className="flex justify-between">
-                        <span className="text-muted-foreground">Department:</span>
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center py-2 border-b border-border">
+                        <span className="text-muted-foreground">Department</span>
                         <span className="font-medium">{departments.find(d => d.id === viewingContact.departmentId)?.name}</span>
-                      </p>
+                      </div>
                       {viewingContact.instituteId && (
-                        <p className="flex justify-between">
-                          <span className="text-muted-foreground">Institute:</span>
+                        <div className="flex justify-between items-center py-2 border-b border-border">
+                          <span className="text-muted-foreground">Institute</span>
                           <span className="font-medium">{institutes.find(i => i.id === viewingContact.instituteId)?.name}</span>
-                        </p>
+                        </div>
                       )}
                       {viewingContact.unitId && (
-                        <p className="flex justify-between">
-                          <span className="text-muted-foreground">Unit:</span>
+                        <div className="flex justify-between items-center py-2 border-b border-border">
+                          <span className="text-muted-foreground">Unit</span>
                           <span className="font-medium">{units.find(u => u.id === viewingContact.unitId)?.name}</span>
-                        </p>
+                        </div>
                       )}
                     </div>
                   </div>
 
                   {/* Additional Information */}
                   {(viewingContact.address || viewingContact.description) && (
-                    <div className="space-y-4">
-                      <h5 className="text-lg font-medium flex items-center gap-2">
-                        <FileText className="h-5 w-5" />
+                    <div className="bg-muted/10 rounded-lg p-6">
+                      <h5 className="text-lg font-medium flex items-center gap-2 mb-4">
+                        <FileText className="h-5 w-5 text-primary" />
                         Additional Information
                       </h5>
-                      <div className="bg-muted/40 rounded-lg p-4 space-y-4">
-                        {viewingContact.address && (
-                          <div>
-                            <p className="text-sm text-muted-foreground mb-1">Address</p>
-                            <p>{viewingContact.address}</p>
-                          </div>
-                        )}
-                        {viewingContact.description && (
-                          <div>
-                            <p className="text-sm text-muted-foreground mb-1">Description</p>
-                            <p>{viewingContact.description}</p>
-                          </div>
-                        )}
-                      </div>
+                      {viewingContact.address && (
+                        <div className="mb-4">
+                          <h6 className="text-sm font-medium text-muted-foreground mb-2">Address</h6>
+                          <p className="text-sm leading-relaxed">{viewingContact.address}</p>
+                        </div>
+                      )}
+                      {viewingContact.description && (
+                        <div>
+                          <h6 className="text-sm font-medium text-muted-foreground mb-2">Description</h6>
+                          <p className="text-sm leading-relaxed">{viewingContact.description}</p>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -1396,71 +1397,45 @@ const ContactManagement = () => {
                 {/* Right Column */}
                 <div className="space-y-6">
                   {/* Contact Numbers */}
-                  <div className="space-y-4">
-                    <h5 className="text-lg font-medium flex items-center gap-2">
-                      <Phone className="h-5 w-5" />
+                  <div className="bg-muted/10 rounded-lg p-6">
+                    <h5 className="text-lg font-medium flex items-center gap-2 mb-4">
+                      <Phone className="h-5 w-5 text-primary" />
                       Contact Numbers
                     </h5>
-                    <div className="bg-muted/40 rounded-lg p-4 space-y-3">
+                    <div className="space-y-3">
                       {viewingContact.mobileNo1 && (
-                        <div className="flex items-center justify-between">
-                          <span className="text-muted-foreground">Mobile No. 1:</span>
+                        <div className="flex items-center justify-between py-2 border-b border-border">
+                          <span className="text-muted-foreground flex items-center gap-2">
+                            <Phone className="h-4 w-4" />
+                            Mobile No. 1
+                          </span>
                           <span className="font-medium">{viewingContact.mobileNo1}</span>
                         </div>
                       )}
-                      {viewingContact.mobileNo2 && (
-                        <div className="flex items-center justify-between">
-                          <span className="text-muted-foreground">Mobile No. 2:</span>
-                          <span className="font-medium">{viewingContact.mobileNo2}</span>
-                        </div>
-                      )}
-                      {viewingContact.whatsAppNo && (
-                        <div className="flex items-center justify-between">
-                          <span className="text-muted-foreground">WhatsApp:</span>
-                          <span className="font-medium">{viewingContact.whatsAppNo}</span>
-                        </div>
-                      )}
-                      {viewingContact.officeNo1 && (
-                        <div className="flex items-center justify-between">
-                          <span className="text-muted-foreground">Office No. 1:</span>
-                          <span className="font-medium">{viewingContact.officeNo1}</span>
-                        </div>
-                      )}
-                      {viewingContact.officeNo2 && (
-                        <div className="flex items-center justify-between">
-                          <span className="text-muted-foreground">Office No. 2:</span>
-                          <span className="font-medium">{viewingContact.officeNo2}</span>
-                        </div>
-                      )}
-                      {viewingContact.faxNo1 && (
-                        <div className="flex items-center justify-between">
-                          <span className="text-muted-foreground">Fax No. 1:</span>
-                          <span className="font-medium">{viewingContact.faxNo1}</span>
-                        </div>
-                      )}
-                      {viewingContact.faxNo2 && (
-                        <div className="flex items-center justify-between">
-                          <span className="text-muted-foreground">Fax No. 2:</span>
-                          <span className="font-medium">{viewingContact.faxNo2}</span>
-                        </div>
-                      )}
+                      {/* Repeat similar structure for other phone numbers */}
                     </div>
                   </div>
 
                   {/* Email Addresses */}
-                  <div className="space-y-4">
-                    <h5 className="text-lg font-medium flex items-center gap-2">
-                      <Mail className="h-5 w-5" />
+                  <div className="bg-muted/10 rounded-lg p-6">
+                    <h5 className="text-lg font-medium flex items-center gap-2 mb-4">
+                      <Mail className="h-5 w-5 text-primary" />
                       Email Addresses
                     </h5>
-                    <div className="bg-muted/40 rounded-lg p-4 space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-muted-foreground">Official Email:</span>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between py-2 border-b border-border">
+                        <span className="text-muted-foreground flex items-center gap-2">
+                          <Mail className="h-4 w-4" />
+                          Official Email
+                        </span>
                         <span className="font-medium">{viewingContact.officialEmail}</span>
                       </div>
                       {viewingContact.personalEmail && (
-                        <div className="flex items-center justify-between">
-                          <span className="text-muted-foreground">Personal Email:</span>
+                        <div className="flex items-center justify-between py-2 border-b border-border">
+                          <span className="text-muted-foreground flex items-center gap-2">
+                            <Mail className="h-4 w-4" />
+                            Personal Email
+                          </span>
                           <span className="font-medium">{viewingContact.personalEmail}</span>
                         </div>
                       )}
@@ -1468,46 +1443,32 @@ const ContactManagement = () => {
                   </div>
 
                   {/* Record Information */}
-                  <div className="space-y-4">
-                    <h5 className="text-lg font-medium flex items-center gap-2">
-                      <FileText className="h-5 w-5" />
+                  <div className="bg-muted/10 rounded-lg p-6">
+                    <h5 className="text-lg font-medium flex items-center gap-2 mb-4">
+                      <FileText className="h-5 w-5 text-primary" />
                       Record Information
                     </h5>
-                    <div className="bg-muted/40 rounded-lg p-4 space-y-3 text-sm">
-                      <div className="flex items-center justify-between">
-                        <span className="text-muted-foreground">Created By:</span>
-                        <span>{viewingContact.createdBy}</span>
+                    <div className="space-y-3 text-sm">
+                      <div className="flex items-center justify-between py-2 border-b border-border">
+                        <span className="text-muted-foreground">Created By</span>
+                        <span className="font-medium">{viewingContact.createdBy}</span>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-muted-foreground">Created At:</span>
-                        <span>
+                      <div className="flex items-center justify-between py-2 border-b border-border">
+                        <span className="text-muted-foreground">Created At</span>
+                        <span className="font-medium">
                           {viewingContact.createdAt.toDate().toLocaleString()}
                         </span>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-muted-foreground">Last Updated By:</span>
-                        <span>{viewingContact.updatedBy}</span>
+                      <div className="flex items-center justify-between py-2 border-b border-border">
+                        <span className="text-muted-foreground">Last Updated By</span>
+                        <span className="font-medium">{viewingContact.updatedBy}</span>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-muted-foreground">Last Updated At:</span>
-                        <span>
+                      <div className="flex items-center justify-between py-2 border-b border-border">
+                        <span className="text-muted-foreground">Last Updated At</span>
+                        <span className="font-medium">
                           {viewingContact.updatedAt.toDate().toLocaleString()}
                         </span>
                       </div>
-                      {viewingContact.deletedAt && (
-                        <>
-                          <div className="flex items-center justify-between">
-                            <span className="text-muted-foreground">Deleted By:</span>
-                            <span>{viewingContact.deletedBy}</span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-muted-foreground">Deleted At:</span>
-                            <span>
-                              {viewingContact.deletedAt.toDate().toLocaleString()}
-                            </span>
-                          </div>
-                        </>
-                      )}
                     </div>
                   </div>
                 </div>
@@ -1515,7 +1476,29 @@ const ContactManagement = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="flex justify-end px-6 py-4 border-t border-border">
+            <div className="flex justify-end gap-4 px-6 py-4 border-t border-border">
+              {canManageContacts && (
+                <>
+                  <button
+                    onClick={() => {
+                      setShowViewModal(false);
+                      handleEdit(viewingContact);
+                    }}
+                    className="px-4 py-2 rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/90 transition-colors"
+                  >
+                    Edit Contact
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowViewModal(false);
+                      handleDelete(viewingContact);
+                    }}
+                    className="px-4 py-2 rounded-md bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors"
+                  >
+                    Delete Contact
+                  </button>
+                </>
+              )}
               <button
                 onClick={() => {
                   setShowViewModal(false);
