@@ -102,10 +102,32 @@ const ContactManagement = () => {
         const data = doc.data();
         return {
           id: doc.id,
-          ...data,
+          title: data.title as ContactTitle,
+          fullName: data.fullName,
+          departmentId: data.departmentId,
+          instituteId: data.instituteId || '',
+          unitId: data.unitId || '',
+          mobileNo1: data.mobileNo1 || '',
+          mobileNo2: data.mobileNo2 || '',
+          whatsAppNo: data.whatsAppNo || '',
+          officeNo1: data.officeNo1 || '',
+          officeNo2: data.officeNo2 || '',
+          faxNo1: data.faxNo1 || '',
+          faxNo2: data.faxNo2 || '',
+          personalEmail: data.personalEmail || '',
+          officialEmail: data.officialEmail,
+          address: data.address || '',
+          description: data.description || '',
+          contactType: data.contactType as ContactType,
+          contactStatus: data.contactStatus as ContactStatus,
+          profilePicture: data.profilePicture || null,
+          status: data.status as 'active' | 'inactive',
           createdAt: data.createdAt ? new Date(data.createdAt.seconds * 1000) : new Date(),
           updatedAt: data.updatedAt ? new Date(data.updatedAt.seconds * 1000) : new Date(),
-          deletedAt: data.deletedAt ? new Date(data.deletedAt.seconds * 1000) : null
+          deletedAt: data.deletedAt ? new Date(data.deletedAt.seconds * 1000) : null,
+          createdBy: data.createdBy || '',
+          updatedBy: data.updatedBy || '',
+          deletedBy: data.deletedBy || null
         } as Contact;
       });
 
@@ -1517,9 +1539,7 @@ const ContactManagement = () => {
                       <div className="flex items-center justify-between">
                         <span className="text-muted-foreground">Created At:</span>
                         <span>
-                          {viewingContact.createdAt instanceof Date 
-                            ? viewingContact.createdAt.toLocaleString()
-                            : new Date(viewingContact.createdAt).toLocaleString()}
+                          {viewingContact.createdAt.toLocaleString()}
                         </span>
                       </div>
                       <div className="flex items-center justify-between">
@@ -1529,9 +1549,7 @@ const ContactManagement = () => {
                       <div className="flex items-center justify-between">
                         <span className="text-muted-foreground">Last Updated At:</span>
                         <span>
-                          {viewingContact.updatedAt instanceof Date 
-                            ? viewingContact.updatedAt.toLocaleString()
-                            : new Date(viewingContact.updatedAt).toLocaleString()}
+                          {viewingContact.updatedAt.toLocaleString()}
                         </span>
                       </div>
                       {viewingContact.deletedAt && (
@@ -1543,9 +1561,7 @@ const ContactManagement = () => {
                           <div className="flex items-center justify-between">
                             <span className="text-muted-foreground">Deleted At:</span>
                             <span>
-                              {viewingContact.deletedAt instanceof Date 
-                                ? viewingContact.deletedAt.toLocaleString()
-                                : new Date(viewingContact.deletedAt).toLocaleString()}
+                              {viewingContact.deletedAt.toLocaleString()}
                             </span>
                           </div>
                         </>
