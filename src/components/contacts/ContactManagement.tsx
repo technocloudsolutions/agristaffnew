@@ -257,7 +257,7 @@ const ContactManagement = () => {
   };
 
   const validateForm = () => {
-    if (!newContact.fullName || !newContact.departmentId || !newContact.officialEmail) {
+    if (!newContact.fullName || !newContact.departmentId) {
       toast.error('Please fill in all required fields');
       return false;
     }
@@ -898,13 +898,12 @@ const ContactManagement = () => {
                   <h4 className="font-medium text-muted-foreground">Additional Information</h4>
                   
                   <div>
-                    <label className="block text-sm font-medium text-muted-foreground mb-1">Official Email *</label>
+                    <label className="block text-sm font-medium text-muted-foreground mb-1">Official Email</label>
                     <input
                       type="email"
                       value={newContact.officialEmail}
                       onChange={(e) => setNewContact({ ...newContact, officialEmail: e.target.value })}
                       className="w-full p-2 border rounded bg-background text-foreground"
-                      required
                     />
                   </div>
 
