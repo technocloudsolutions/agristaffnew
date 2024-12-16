@@ -8,6 +8,7 @@ export interface Contact {
   id: string;
   title: ContactTitle;
   fullName: string;
+  designation?: string;
   departmentId: string;
   instituteId?: string;
   unitId?: string;
@@ -37,6 +38,7 @@ export interface Contact {
 export interface NewContact {
   title: ContactTitle;
   fullName: string;
+  designation?: string;
   departmentId: string;
   instituteId?: string;
   unitId?: string;

@@ -6,40 +6,47 @@ export async function GET() {
     // Create template workbook with your Firebase data structure
     const template = [
       {
-        title: 'Mr',
-        fullName: 'John Doe',
-        departmentId: 'department-id-1',
-        instituteId: 'institute-id-1',
-        unitId: 'unit-id-1',
-        mobileNo1: '+94771234567',
-        mobileNo2: '',
-        whatsAppNo: '+94771234567',
-        officeNo1: '+94112345678',
-        officeNo2: '',
-        faxNo1: '',
-        faxNo2: '',
-        personalEmail: 'john.personal@example.com',
-        officialEmail: 'john.official@example.com',
-        address: '123 Main St, City',
-        description: 'Department Head',
-        contactType: 'Person',
-        contactStatus: 'On Duty'
+        title: 'Mr/Mrs/Miss/Dr/Prof',
+        fullName: 'Full Name',
+        designation: 'Designation',
+        departmentId: 'Department ID',
+        instituteId: 'Institute ID (Optional)',
+        unitId: 'Unit ID (Optional)',
+        mobileNo1: '+94XXXXXXXXX',
+        mobileNo2: '+94XXXXXXXXX (Optional)',
+        whatsAppNo: '+94XXXXXXXXX (Optional)',
+        officeNo1: '+94XXXXXXXXX (Optional)',
+        officeNo2: '+94XXXXXXXXX (Optional)',
+        faxNo1: '+94XXXXXXXXX (Optional)',
+        faxNo2: '+94XXXXXXXXX (Optional)',
+        personalEmail: 'personal@email.com (Optional)',
+        officialEmail: 'official@email.com',
+        address: 'Address (Optional)',
+        description: 'Description (Optional)',
+        contactType: 'Person/Institute',
+        contactStatus: 'On Duty/Retired/Transferred/Other'
       }
     ];
 
+    // Create a new workbook and worksheet
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.json_to_sheet(template);
+
+    // Add the worksheet to the workbook
     XLSX.utils.book_append_sheet(wb, ws, 'Contacts Template');
 
-    const buffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
+    // Generate buffer
+    const buf = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
 
-    return new NextResponse(buffer, {
+    // Return the Excel file
+    return new NextResponse(buf, {
       headers: {
-        'Content-Disposition': 'attachment; filename="contacts_template.xlsx"',
         'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'Content-Disposition': 'attachment; filename="contacts_template.xlsx"',
       },
     });
   } catch (error) {
+    console.error('Error generating template:', error);
     return NextResponse.json(
       { error: 'Failed to generate template' },
       { status: 500 }

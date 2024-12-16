@@ -57,6 +57,7 @@ const ContactManagement = () => {
   const [newContact, setNewContact] = useState<NewContact>({
     title: 'Mr',
     fullName: '',
+    designation: '',
     departmentId: '',
     instituteId: '',
     unitId: '',
@@ -108,6 +109,7 @@ const ContactManagement = () => {
           id: doc.id,
           title: data.title as ContactTitle,
           fullName: data.fullName,
+          designation: data.designation || '',
           departmentId: data.departmentId,
           instituteId: data.instituteId || '',
           unitId: data.unitId || '',
@@ -303,6 +305,7 @@ const ContactManagement = () => {
     setNewContact({
       title: contact.title || 'Mr',
       fullName: contact.fullName || '',
+      designation: contact.designation || '',
       departmentId: contact.departmentId || '',
       instituteId: contact.instituteId || '',
       unitId: contact.unitId || '',
@@ -420,6 +423,7 @@ const ContactManagement = () => {
     setNewContact({
       title: 'Mr',
       fullName: '',
+      designation: '',
       departmentId: '',
       instituteId: '',
       unitId: '',
@@ -760,6 +764,16 @@ const ContactManagement = () => {
                         required
                       />
                     </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-muted-foreground mb-1">Designation</label>
+                    <input
+                      type="text"
+                      value={newContact.designation}
+                      onChange={(e) => setNewContact({ ...newContact, designation: e.target.value })}
+                      className="w-full p-2 border rounded bg-background text-foreground"
+                    />
                   </div>
 
                   <div>
@@ -1411,7 +1425,60 @@ const ContactManagement = () => {
                           <span className="font-medium">{viewingContact.mobileNo1}</span>
                         </div>
                       )}
-                      {/* Repeat similar structure for other phone numbers */}
+                      {viewingContact.mobileNo2 && (
+                        <div className="flex items-center justify-between py-2 border-b border-border">
+                          <span className="text-muted-foreground flex items-center gap-2">
+                            <Phone className="h-4 w-4" />
+                            Mobile No. 2
+                          </span>
+                          <span className="font-medium">{viewingContact.mobileNo2}</span>
+                        </div>
+                      )}
+                      {viewingContact.whatsAppNo && (
+                        <div className="flex items-center justify-between py-2 border-b border-border">
+                          <span className="text-muted-foreground flex items-center gap-2">
+                            <MessageSquare className="h-4 w-4" />
+                            WhatsApp
+                          </span>
+                          <span className="font-medium">{viewingContact.whatsAppNo}</span>
+                        </div>
+                      )}
+                      {viewingContact.officeNo1 && (
+                        <div className="flex items-center justify-between py-2 border-b border-border">
+                          <span className="text-muted-foreground flex items-center gap-2">
+                            <Building className="h-4 w-4" />
+                            Office No. 1
+                          </span>
+                          <span className="font-medium">{viewingContact.officeNo1}</span>
+                        </div>
+                      )}
+                      {viewingContact.officeNo2 && (
+                        <div className="flex items-center justify-between py-2 border-b border-border">
+                          <span className="text-muted-foreground flex items-center gap-2">
+                            <Building className="h-4 w-4" />
+                            Office No. 2
+                          </span>
+                          <span className="font-medium">{viewingContact.officeNo2}</span>
+                        </div>
+                      )}
+                      {viewingContact.faxNo1 && (
+                        <div className="flex items-center justify-between py-2 border-b border-border">
+                          <span className="text-muted-foreground flex items-center gap-2">
+                            <Printer className="h-4 w-4" />
+                            Fax No. 1
+                          </span>
+                          <span className="font-medium">{viewingContact.faxNo1}</span>
+                        </div>
+                      )}
+                      {viewingContact.faxNo2 && (
+                        <div className="flex items-center justify-between py-2 border-b border-border">
+                          <span className="text-muted-foreground flex items-center gap-2">
+                            <Printer className="h-4 w-4" />
+                            Fax No. 2
+                          </span>
+                          <span className="font-medium">{viewingContact.faxNo2}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -1422,13 +1489,15 @@ const ContactManagement = () => {
                       Email Addresses
                     </h5>
                     <div className="space-y-3">
-                      <div className="flex items-center justify-between py-2 border-b border-border">
-                        <span className="text-muted-foreground flex items-center gap-2">
-                          <Mail className="h-4 w-4" />
-                          Official Email
-                        </span>
-                        <span className="font-medium">{viewingContact.officialEmail}</span>
-                      </div>
+                      {viewingContact.officialEmail && (
+                        <div className="flex items-center justify-between py-2 border-b border-border">
+                          <span className="text-muted-foreground flex items-center gap-2">
+                            <Mail className="h-4 w-4" />
+                            Official Email
+                          </span>
+                          <span className="font-medium">{viewingContact.officialEmail}</span>
+                        </div>
+                      )}
                       {viewingContact.personalEmail && (
                         <div className="flex items-center justify-between py-2 border-b border-border">
                           <span className="text-muted-foreground flex items-center gap-2">
@@ -1441,35 +1510,63 @@ const ContactManagement = () => {
                     </div>
                   </div>
 
-                  {/* Record Information */}
+                  {/* Basic Information */}
                   <div className="bg-muted/10 rounded-lg p-6">
                     <h5 className="text-lg font-medium flex items-center gap-2 mb-4">
-                      <FileText className="h-5 w-5 text-primary" />
-                      Record Information
+                      <User className="h-5 w-5 text-primary" />
+                      Basic Information
                     </h5>
-                    <div className="space-y-3 text-sm">
+                    <div className="space-y-3">
                       <div className="flex items-center justify-between py-2 border-b border-border">
-                        <span className="text-muted-foreground">Created By</span>
-                        <span className="font-medium">{viewingContact.createdBy}</span>
+                        <span className="text-muted-foreground">Full Name</span>
+                        <span className="font-medium">{viewingContact.fullName}</span>
+                      </div>
+                        <div className="flex items-center justify-between py-2 border-b border-border">
+                          <span className="text-muted-foreground">Designation</span>
+                        <span className="font-medium">{viewingContact.designation || '-'}</span>
+                        </div>
+                      <div className="flex items-center justify-between py-2 border-b border-border">
+                        <span className="text-muted-foreground">Contact Type</span>
+                        <span className="font-medium">{viewingContact.contactType}</span>
                       </div>
                       <div className="flex items-center justify-between py-2 border-b border-border">
-                        <span className="text-muted-foreground">Created At</span>
-                        <span className="font-medium">
-                          {viewingContact.createdAt.toDate().toLocaleString()}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between py-2 border-b border-border">
-                        <span className="text-muted-foreground">Last Updated By</span>
-                        <span className="font-medium">{viewingContact.updatedBy}</span>
-                      </div>
-                      <div className="flex items-center justify-between py-2 border-b border-border">
-                        <span className="text-muted-foreground">Last Updated At</span>
-                        <span className="font-medium">
-                          {viewingContact.updatedAt.toDate().toLocaleString()}
-                        </span>
+                        <span className="text-muted-foreground">Contact Status</span>
+                        <span className="font-medium">{viewingContact.contactStatus}</span>
                       </div>
                     </div>
                   </div>
+
+                  {/* Location Information */}
+                  {viewingContact.address && (
+                    <div className="bg-muted/10 rounded-lg p-6">
+                      <h5 className="text-lg font-medium flex items-center gap-2 mb-4">
+                        <MapPin className="h-5 w-5 text-primary" />
+                        Location Information
+                      </h5>
+                      <div className="space-y-3">
+                        <div className="py-2">
+                          <span className="text-muted-foreground block mb-2">Address</span>
+                          <span className="font-medium">{viewingContact.address}</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Additional Information */}
+                  {viewingContact.description && (
+                    <div className="bg-muted/10 rounded-lg p-6">
+                      <h5 className="text-lg font-medium flex items-center gap-2 mb-4">
+                        <FileText className="h-5 w-5 text-primary" />
+                        Additional Information
+                      </h5>
+                      <div className="space-y-3">
+                        <div className="py-2">
+                          <span className="text-muted-foreground block mb-2">Description</span>
+                          <span className="font-medium">{viewingContact.description}</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
